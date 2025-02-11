@@ -7,4 +7,8 @@ Etudiants :
 * Carlota Molina Chacon
 * Célestine Bessaire
 
+<<<<<<< HEAD
 Hola caracola_ CM
+=======
+Ceci est une modification
+>>>>>>> 575229d10f7efff5856601c43bf9edf4f98416b8

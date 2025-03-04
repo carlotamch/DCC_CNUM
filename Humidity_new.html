@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Humedad en Tiempo Real</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        .humidity-label {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .humidity-label span {
+            font-size: 30px;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <h1>Medición de Humedad</h1>
+    
+    <div class="container">
+        <canvas id="humidityCanvas" width="200" height="400"></canvas>
+        <div class="humidity-label">
+            <span>💧</span>
+            <p>Humedad: <span id="humidity">--</span>%</p>
+        </div>
+    </div>
+
+    <script>
+        function fetchData() {
+            // Simulación de datos (sustituir por datos reales de sensores si es necesario)
+            const humedad = Math.floor(Math.random() * 100); 
+
+            document.getElementById("humidity").textContent = humedad;
+            drawHumidity(humedad);
+        }
+
+        function drawHumidity(humidity) {
+            const canvas = document.getElementById("humidityCanvas");
+            const ctx = canvas.getContext("2d");
+
+            // Limpiar el canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujar la escala de humedad
+            ctx.fillStyle = "blue";
+            ctx.fillRect(90, 50, 20, 300); // Cuerpo del termómetro
+
+            // Dibujar nivel de humedad
+            const level = 350 - (humidity * 3);
+            ctx.fillStyle = "lightblue";
+            ctx.fillRect(90, level, 20, 350 - level);
+
+            // Dibujar gota de agua en la base
+            ctx.fillStyle = "blue";
+            ctx.beginPath();
+            ctx.arc(100, 380, 15, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        setInterval(fetchData, 2000); // Actualizar cada 2 segundos
+        fetchData(); // Llamar inmediatamente
+    </script>
+</body>
+</html>

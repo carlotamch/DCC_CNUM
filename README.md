@@ -8,7 +8,3 @@ Etudiants :
 * Célestine Bessaire
 
 
-Hola caracola_ CM_j'ai fait un modification
-=======
-Ceci est une modification
-

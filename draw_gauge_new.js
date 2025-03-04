@@ -431,6 +431,74 @@ function displayThermometer(val, div) {
     ctx.fillText(val.toFixed(1) + " °C", x + width / 2, y - 10);
 }
 
+function drawThermometer(ctx, value) {
+    const width = ctx.canvas.width;
+    const height = ctx.canvas.height;
+    const padding = 20;
+    const thermometerWidth = 40;
+    const thermometerHeight = height - 2 * padding;
+    const bulbRadius = 30;
+    const bulbX = width / 2 - thermometerWidth / 2;
+    const bulbY = height - padding - bulbRadius;
+    const tubeX = bulbX + (thermometerWidth / 2) - (thermometerWidth / 4);
+    const tubeY = padding;
+    const tubeWidth = thermometerWidth / 2;
+    const tubeHeight = bulbY - tubeY;
+
+    // Dibujar el tubo del termómetro
+    ctx.beginPath();
+    ctx.rect(tubeX, tubeY, tubeWidth, tubeHeight);
+    ctx.fillStyle = "#e0e0e0";
+    ctx.fill();
+    ctx.strokeStyle = "#000";
+    ctx.stroke();
+
+    // Dibujar el bulbo del termómetro
+    ctx.beginPath();
+    ctx.arc(bulbX + thermometerWidth / 2, bulbY, bulbRadius, 0, Math.PI * 2);
+    ctx.fillStyle = "#e0e0e0";
+    ctx.fill();
+    ctx.strokeStyle = "#000";
+    ctx.stroke();
+
+    // Dibujar el líquido dentro del termómetro
+    const liquidHeight = (value / 100) * tubeHeight;
+    ctx.beginPath();
+    ctx.rect(tubeX, tubeY + (tubeHeight - liquidHeight), tubeWidth, liquidHeight);
+    ctx.fillStyle = "#00aaff";
+    ctx.fill();
+
+    // Dibujar la gota de agua
+    const dropX = bulbX + thermometerWidth + 50;
+    const dropY = bulbY - bulbRadius / 2;
+    ctx.beginPath();
+    ctx.moveTo(dropX, dropY);
+    ctx.bezierCurveTo(dropX - 20, dropY - 20, dropX - 30, dropY + 10, dropX, dropY + 30);
+    ctx.bezierCurveTo(dropX + 30, dropY + 10, dropX + 20, dropY - 20, dropX, dropY);
+    ctx.fillStyle = "#00aaff";
+    ctx.fill();
+    ctx.strokeStyle = "#000";
+    ctx.stroke();
+}
+
+function updateThermometer(value) {
+    const canvas = document.getElementById('thermoChart');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawThermometer(ctx, value);
+}
+// Llamada a la función cuando la página cargue
+document.addEventListener('DOMContentLoaded', function () {
+    fetch('ruta/al/archivo.json')
+        .then(response => response.json())
+        .then(data => {
+            const humidityValue = data.humidity;
+            updateThermometer(humidityValue);
+        })
+        .catch(error => {
+            console.error('Error al cargar el JSON:', error);
+        });
+});
 
 
 

@@ -8,7 +8,3 @@ Etudiants :
 * Célestine Bessaire
 
 
-Hola petardo
-=======
-Ceci est une modification
-

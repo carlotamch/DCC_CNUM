@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Econect</title>
+    <style>
+        table {
+            border: none;
+            width: 100%;
+        }
+        td {
+            border: solid;
+            border-color: white;
+            padding: 15px;
+            vertical-align: top;
+        }
+        .data-div {
+            width: 500px;
+            height: 30px;
+            line-height: 0.6;
+            border-width: 2px;
+            font-family: Arial;
+            color: black;
+            border-style: solid;
+            border-color: white;
+        }
+        .chart-canvas {
+            border-style: solid;
+            border-color: white;
+        }
+    </style>
+    <link rel="icon" type="image/png" href="img/econect-favicon.png" />
+</head>
+<body>
+    <table id="tab1" width="98%">
+        <tr>
+            <td width="55%">
+                <div id="divGeneral" style="height:100px;border-width:2px;line-height: 0.6; border-style:none;border-color:white; position: relative; top: -10px;"></div>
+            </td>
+            <td width="38%" style="vertical-align: middle;">
+                <img src="img/logo-feder.png" width="650px" style="position: relative; top: -10px; border-style:none;" alt="Feder Logo">
+            </td>
+            <td>
+                <img src="img/logo-econect.png" width="140px" style="position: relative; top: -5px; border-style:none;" alt="Econect Logo">
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td width="3%"></td>
+            <td width="25%">
+                <div id="divData1" class="data-div"></div>
+                <br>
+                <canvas id="thermoChart" width="500" height="500" style="border-style:solid;border-color:white" class="chart-canvas"></canvas>
+            </td>
+            <td width="25%">
+                <div id="divData2" class="data-div"></div>
+                <br>
+                <canvas id="humidityMeter" width="500" height="500" style="border-style:solid;border-color:white" class="chart-canvas"></canvas>
+            </td>
+            <td width="25%">
+                <div id="divData3" class="data-div"></div>
+                <br>
+                <canvas id="divChart3" width="500" height="500" style="border-style:solid;border-color:white" class="chart-canvas"></canvas>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <div id="divData4" class="data-div"></div>
+                <br>
+                <canvas id="divChart4" width="500" height="500" style="border-style:solid;border-color:white" class="chart-canvas"></canvas>
+            </td>
+            <td>
+                <div id="divData5" class="data-div"></div>
+                <br>
+                <canvas id="divChart5" width="500" height="500" style="border-style:solid;border-color:white" class="chart-canvas"></canvas>
+            </td>
+            <td>
+                <div id="divData6" class="data-div"></div>
+                <br>
+                <canvas id="divChart6" width="500" height="500" style="border-style:solid;border-color:white" class="chart-canvas"></canvas>
+            </td>
+        </tr>
+    </table>
+    <script src="avechigrometrie.js" type="text/javascript" charset="utf-8" defer></script>
+</body>
+</html>

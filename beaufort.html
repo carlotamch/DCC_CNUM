@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Econect</title>
+    <style>
+        table {
+          border: none;
+        }
+
+        td {
+          border: solid;
+          border-color: white;
+          padding: 15px;
+          vertical-align: top; /* Alignement vertical vers le haut */
+        }
+    </style>
+    <link rel="icon" type="image/png" href="img/econect-favicon.png" />
+</head>
+<body>
+    <table id = "tab1" width = "98%">
+        <tr>
+            <td width="55%">
+                <div id="divGeneral" style="height:100px;border-width:2px;line-height: 0.6; border-style:none;border-color:white; position: relative; top: -10px;"></div> 
+            </td>
+            <td width="38%" style = "vertical-align: middle;" >
+                <img src = "img/logo-feder.png" width=650px style="position: relative; top: -10px; border-style:none;">
+            </td>
+            <td>
+                <img src = "img/logo-econect.png" width=140px style="position: relative; top: -5px; border-style:none;">
+            </td>
+
+        </tr>
+    </table>
+    <table width="100%">
+        <tr>
+            <td width="3%">
+            </td>
+            <td width="100%">
+                <canvas id="windChart" width="1200" height="1000" style="border-style:solid;border-color:white"></canvas> <!-- Traçage du graphe dans ce canvas -->
+            
+        </tr>
+    </table>
+	<script src="beaufort.js" type="text/javascript" charset="utf-8"></script>
+                        
+</body>
+</html>

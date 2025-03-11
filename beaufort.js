@@ -1,11 +1,24 @@
 console.log("Debut du script");
 
-async function fetchData(param) {
-    const url = `http://145.239.199.14/cgi-bin/barthe/provide_single_json.py?param=5`;
-	const response = await fetch(url);
+async function fetchData(param) { 
+    const url = `http://145.239.199.14/cgi-bin/barthe/provide_data.py?param=${param}`;
+    const response = await fetch(url);
     const jsonData = await response.json();
-    return jsonData;
+    return jsonData
 }
+
+async function displayValues() {
+    const data = await fetchData(5); // Appelle la fonction et attend la réponse
+    const moy = data[0].moyenne
+    const minimum =data[0].min
+    const maximum=data[0].max
+
+     // Appel de la fonction displaywind pour afficher le graphique avec les données récupérées
+    displaywind(moy, minimum, maximum, "windChart"); // Passer les valeurs à displaywind
+}
+
+// Appel de la fonction displayValues pour démarrer l'affichage des valeurs
+displayValues();
 
 
 function displaywind(valmoy, valmin, valmax, div) {
@@ -158,6 +171,3 @@ function displaywind(valmoy, valmin, valmax, div) {
         ctx.stroke();
     }
 }
-
-
-displaywind(50,20,70,"windChart")

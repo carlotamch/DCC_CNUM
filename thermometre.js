@@ -1,43 +1,24 @@
-console.log("Debut du script");
-var previous_val = [0,0,0,0,-100,0];
-const val = [0,0,0,0,-100,0];
-const step_val = [0,0,0,0,-100,0];
-const step = [0,0,0,0,0,0];
-var lastDate = new Date;
-lastDate = lastDate.getTime();
-var siteLocation = "Francon (La Barthe)";
-var gauge_drawing = false;
-var first_drawing = [true,true,true,true,true,true];
+console.log("Début du script");
 
 async function fetchData(param) { 
     const url = `http://145.239.199.14/cgi-bin/barthe/provide_data.py?param=${param}`;
-    try {
-        const response = await fetch(url);
-        const jsonData = await response.json();
-
-        if (jsonData.length > 0) { // Vérifier que le tableau n'est pas vide
-            const { moyenne, max, min } = jsonData[0]; // Extraction des valeurs
-            console.log("Moyenne:", moyenne, "Max:", max, "Min:", min);
-            return { moyenne, max, min }; // Retourne un objet contenant les valeurs
-        } else {
-            console.error("Données JSON vides !");
-            return null;
-        }
-    } catch (error) {
-        console.error("Erreur lors de la récupération des données:", error);
-        return null;
-    }
+    const response = await fetch(url);
+    const jsonData = await response.json();
+    return jsonData
 }
 
-async function dataextraction() {
+async function displayValues() {
     const data = await fetchData(1); // Appelle la fonction et attend la réponse
+    const moy = data[0].moyenne
+    const minimum =data[0].min
+    const maximum=data[0].max
 
-    if (data) {
-        const { moyenne, max, min } = data; // Extraction des valeurs dans des constantes
-        console.log(`Moy: ${moyenne}, Min: ${min}, Max: ${max}`);
-    }
+     // Appel de la fonction displaywind pour afficher le graphique avec les données récupérées
+    displayThermometer(moy, minimum, maximum, "thermoChart"); // Passer les valeurs à displaywind
 }
 
+// Appel de la fonction displayValues pour démarrer l'affichage des valeurs
+displayValues();
 
 
 function displayThermometer(valmoy,valmin,valmax, div) {
@@ -185,11 +166,3 @@ function displayThermometer(valmoy,valmin,valmax, div) {
     ctx.textAlign = 'center';
     ctx.fillText(valmoy.toFixed(1) + " °C", x + width / 2, y - 35);
 }
-
-
-
-
-
-
-
-displayThermometer(9.724, 4.2, 16.5,"thermoChart")

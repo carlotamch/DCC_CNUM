@@ -1,27 +1,38 @@
 console.log("Debut du script");
 
-async function fetchData(param) { 
+async function fetchDataRes(param) { 
     const url = `http://145.239.199.14/cgi-bin/barthe/provide_data.py?param=${param}`;
     const response = await fetch(url);
     const jsonData = await response.json();
     return jsonData
 }
 
+async function fetchDataInst(param) { 
+    const url = `http://145.239.199.14/cgi-bin/barthe/provide_single_json.py?param=${param}`;
+    const response = await fetch(url);
+    const jsonData = await response.json();
+    return jsonData
+}
+
 async function displayValues() {
-    const data = await fetchData(5); // Appelle la fonction et attend la réponse
-    const moy = data[0].moyenne
-    const minimum =data[0].min
-    const maximum=data[0].max
+    const data_res = await fetchDataRes(5); // Appelle la fonction et attend la réponse
+    const moy = data_res[0].moyenne
+    const minimum =data_res[0].min
+    const datarafale = await fetchDataRes(6)
+    const maximum=datarafale[0].max
+    const data_inst =await fetchDataInst(5)
+    const inst = data_inst[0]._value
+    const heure = data_inst[0]._time
 
      // Appel de la fonction displaywind pour afficher le graphique avec les données récupérées
-    displaywind(moy, minimum, maximum, "windChart"); // Passer les valeurs à displaywind
+    displaywind(inst,heure,moy, minimum, maximum, "windChart"); // Passer les valeurs à displaywind
 }
 
 // Appel de la fonction displayValues pour démarrer l'affichage des valeurs
 displayValues();
 
 
-function displaywind(valmoy, valmin, valmax, div) {
+function displaywind(val_inst,valtime,valmoy, valmin, valmax, div) {
     var canvas = document.getElementById(div);
     var ctx = canvas.getContext("2d");
 
@@ -98,7 +109,7 @@ function displaywind(valmoy, valmin, valmax, div) {
     ctx.stroke();
 
     // Calculer la largeur du remplissage en fonction de la valeur
-    var ratio = (valmoy - min_value) / (max_value - min_value);
+    var ratio = (val_inst - min_value) / (max_value - min_value);
     var fillWidth = ratio * width;  // La hauteur du rectangle exclut le cercle
     
     // Dessiner le remplissage du rectangle
@@ -113,26 +124,43 @@ function displaywind(valmoy, valmin, valmax, div) {
     }
 
     // Fonction pour dessiner un triangle (flèche) pointant vers le bas
-    function drawTriangle(ctx, x, y) {
+    function drawTriangle(ctx, x, y, color) {
         ctx.beginPath();
         ctx.moveTo(x, y);           // Pointe de la flèche vers le bas
         ctx.lineTo(x - 10, y - 10); // Coin haut gauche
         ctx.lineTo(x + 10, y - 10); // Coin haut droit
         ctx.closePath();
-        ctx.fillStyle = 'red';       // Couleur de la flèche
+        ctx.fillStyle = color;       // Couleur dynamique
         ctx.fill();
     }
+    
+    function drawTriangleUp(ctx, x, y, color) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);           // Pointe de la flèche vers le haut
+        ctx.lineTo(x - 10, y + 10); // Coin bas gauche
+        ctx.lineTo(x + 10, y + 10); // Coin bas droit
+        ctx.closePath();
+        ctx.fillStyle = color;       // Couleur dynamique
+        ctx.fill();
+    }
+    
 
     // Calculer les positions X pour min et max
     let xMin = valueToX(valmin);
     let xMax = valueToX(valmax);
+    // Calculer la position X pour valmoy
+    let xMoy = valueToX(valmoy);
 
     // Position verticale des flèches (juste au-dessus du rectangle)
     let arrowY = y - 10;  // Position des flèches juste au-dessus du rectangle
+    // Calculer la position Y sous l'axe des graduations
+    let belowY = y + height + 10;  // Position sous le rectangle
 
     // Dessiner les triangles (flèches) pour min et max
-    drawTriangle(ctx, xMin, arrowY); // Flèche pour min
-    drawTriangle(ctx, xMax, arrowY); // Flèche pour max
+    drawTriangle(ctx, xMin, arrowY,'blue'); // Flèche pour min
+    drawTriangle(ctx, xMax, arrowY,'darkred'); // Flèche pour max
+    // Dessiner une flèche pour valmoy
+    drawTriangleUp(ctx, xMoy, belowY,'black');
 
     // Position pour afficher les légendes (valeurs min et max)
     let textY = arrowY - 15; // Position verticale du texte (légendes)
@@ -141,14 +169,33 @@ function displaywind(valmoy, valmin, valmax, div) {
     ctx.font = '13px Arial';
     ctx.fillStyle = 'black';
     ctx.textAlign = 'top';
-    ctx.fillText(valmin.toFixed(1) + " km/h", xMin, textY); // Légende pour min
-    ctx.fillText(valmax.toFixed(1) + " km/h", xMax, textY); // Légende pour max
+    // Ajouter la légende de valmoy
+    ctx.fillText("moyenne : "+ valmoy.toFixed(1) + " km/h", xMoy, belowY + 22)
+    
+    ctx.font = '13px Arial';
+    ctx.fillStyle = 'blue';
+    ctx.textAlign = 'top';
+    ctx.fillText("minimum : "+ valmin.toFixed(1) + " km/h", xMin, textY); // Légende pour min
+
+    ctx.font = '13px Arial';
+    ctx.fillStyle = 'darkred';
+    ctx.textAlign = 'top';
+    ctx.fillText("maximum : "+ valmax.toFixed(1) + " km/h", xMax, textY); // Légende pour max
+    
 
     // Afficher la valeur numérique au-dessus du rectangle
     ctx.font = '20px Arial';
     ctx.fillStyle = '#000';
     ctx.textAlign = 'center';
-    ctx.fillText("Vitesse du vent : " + valmoy.toFixed(1) + " km/h", x + width / 2, y - 40);
+    // Extraire l'heure et la minute
+    let dateObj = new Date(valtime);
+    let hours = dateObj.getHours().toString().padStart(2, '0'); // Assure deux chiffres
+    let minutes = dateObj.getMinutes().toString().padStart(2, '0'); // Assure deux chiffres
+    let formattedTime = hours + ":" + minutes;
+
+    // Affichage avec l'heure formatée
+    ctx.fillText("Vitesse du vent à " + formattedTime + " : " + val_inst.toFixed(1) + " km/h", x + width / 2, y - 40);
+
 
     // Dessiner les graduations verticales (tous les 10)
     ctx.font = '14px Arial';

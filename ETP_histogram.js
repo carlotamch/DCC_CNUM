@@ -11,7 +11,7 @@ async function fetchHourlyMeans(param, time) {
     // Initialisation d'un tableau pour stocker les moyennes horaires avec leurs heures respectives
     const moyennes = [];
     // Calcul du pas (step) en jours. On suppose que time est en jours.
-    const step = 1 / 24; // 1 heure = 1/24 de jour
+    const step = 0.04166; // 1 heure = 1/24 de jour
     // Initialisation de la période de départ (la période totale en jours est donnée par la variable 'time')
     let period = time; // La période de départ est définie par l'utilisateur (en jours)
     // Calcul du nombre d'heures dans la période définie par 'time' (en jours)
@@ -42,19 +42,23 @@ function plotHistogram(data, labels, canvasId) {
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: labels,  // Les heures comme labels (axe X)
+            labels: labels,
             datasets: [{
-                label: 'Histogramme des moyennes horaires',
-                data: data,  // Les moyennes horaires comme données (axe Y)
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',  // Couleur de fond des barres
-                borderColor: 'rgba(75, 192, 192, 1)',  // Couleur des bordures des barres
+                label: 'ETP horaire sur les 24 dernières heures',
+                data: data,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1
             }]
         },
         options: {
             scales: {
                 y: {
-                    beginAtZero: true  // Commencer l'axe des Y à 0
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'mm/h'  // Ajout de l’unité sur l’axe Y
+                    }
                 }
             }
         }
@@ -62,43 +66,48 @@ function plotHistogram(data, labels, canvasId) {
 }
 
 
-async function fetchAndPlotHistogram(param, time, canvasId) {
-    // Récupérer les moyennes horaires en attendant la réponse
-    const hourlyMeans = await fetchHourlyMeans(param, time);
+async function fetchAndPlotHistogram(time, canvasId) {
+    // Récupérer toutes les moyennes en parallèle pour optimiser la vitesse
+    const [hourlyMeansTemp, hourlyMeansHumidity, hourlyMeansWind, hourlyMeansSolarWh] = await Promise.all([
+        fetchHourlyMeans(1, time),  // Température
+        fetchHourlyMeans(2, time),  // Humidité
+        fetchHourlyMeans(5, time),  // Vent
+        fetchHourlyMeans(4, time)   // Rayonnement solaire (Wh/m²)
+    ]);
+
+    // Convertir le rayonnement solaire de Wh/m² à MJ/m²
+    const hourlyMeansSolarMJ = hourlyMeansSolarWh.map(value => value * 0.0036);
+
+    // Calculer l'ETP en utilisant les tableaux récupérés
+    const hourlyMeansETP = ETP(hourlyMeansSolarMJ, hourlyMeansTemp, hourlyMeansHumidity, hourlyMeansWind);
 
     // Générer les labels allant de -(time * 24 - 1) à 0
     const labels = Array.from({ length: time * 24 }, (_, i) => -(time * 24 - 1 - i));
 
     // Tracer l'histogramme
-    plotHistogram(hourlyMeans, labels, canvasId);
+    plotHistogram(hourlyMeansETP, labels, canvasId);
 }
 
 
+fetchAndPlotHistogram(1,'histogramETP')
 
-fetchAndPlotHistogram(1,1,'histogramCanvas')
-
-// fonction qui calcule l'ETP selon Penman-Monteith
 function ETP(solar, temp, humidity, wind) {
-    // Convertir la température en Kelvin
-    const tempK = temp + 273.15;
-    // Calculer la pression de vapeur saturante (e_s) en kPa
-    const e_s = 0.6108 * Math.exp((17.27 * temp) / (temp + 237.3));
-    // Calculer la pression de vapeur actuelle (e_a) en kPa
-    const e_a = e_s * (humidity / 100);
-    // Calculer le déficit de pression de vapeur (VPD) en kPa
-    const VPD = e_s - e_a;
+    // Définir une pression atmosphérique standard en kPa (si non fournie)
+    const pressure = 101.3; // kPa, pression standard au niveau de la mer
 
-    // Calculer le rayonnement net (Rn) en MJ/m²/heure
-    const Rn = 0.77 * solar;
-    // Calculer la constante psychrométrique (gamma) en kPa/°C
-    const gamma = 0.000665 * pressure;
-    // Calculer la pente de la courbe de pression de vapeur (Delta) en kPa/°C
-    const Delta = (4098 * e_s) / Math.pow((temp + 237.3), 2);
-    // Convertir le vent en m/s
-    const windms = wind/3.6
-    // Calculer l'ETP en mm/jour
-    const etp = (0.408 * Delta * (Rn - 0.34) + (900 / (tempK + 273)) * wind * VPD) / (Delta + gamma * (1 + 0.34 * wind));
-    return etp;
+    // Calculer l'ETP pour chaque élément de la liste
+    return solar.map((s, i) => {
+        const tempK = temp[i] + 273.15;
+        const e_s = 0.6108 * Math.exp((17.27 * temp[i]) / (temp[i] + 237.3));
+        const e_a = e_s * (humidity[i] / 100);
+        const VPD = e_s - e_a;
+        const Rn = 0.77 * s;
+        const gamma = 0.000665 * pressure;
+        const Delta = (4098 * e_s) / Math.pow((temp[i] + 237.3), 2);
+        const windms = wind[i] / 3.6;
+
+        return (0.408 * Delta * (Rn - 0.34) + (900 / (tempK + 273)) * windms * VPD) / (Delta + gamma * (1 + 0.34 * windms));
+    });
 }
 
 

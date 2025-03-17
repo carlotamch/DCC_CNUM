@@ -1,11 +1,12 @@
 console.log("Début du script");
 
-async function fetchDataRes(param) { 
-    const url = `http://145.239.199.14/cgi-bin/barthe/provide_data.py?param=${param}`;
+async function fetchDataRes(param, period) { 
+    const url = `http://145.239.199.14/cgi-bin/barthe/provide_data.py?param=${param}&period=${period}`;
     const response = await fetch(url);
     const jsonData = await response.json();
-    return jsonData
+    return jsonData;
 }
+
 
 async function fetchDataInst(param) { 
     const url = `http://145.239.199.14/cgi-bin/barthe/provide_single_json.py?param=${param}`;
@@ -16,15 +17,17 @@ async function fetchDataInst(param) {
 
 
 async function displayValues() {
-    const data_res = await fetchDataRes(1); // Appelle la fonction et attend la réponse
-    const moy = data_res[0].moyenne
-    const minimum =data_res[0].min
-    const maximum=data_res[0].max
-    const data_inst =await fetchDataInst(1)
-    const val_inst = data_inst[0]._value
-     // Appel de la fonction displaywind pour afficher le graphique avec les données récupérées
-    displayThermometer(val_inst,moy, minimum, maximum, "thermoChart"); // Passer les valeurs à displaywind
+    let period = document.getElementById("period").value; // Récupérer la valeur sélectionnée
+    const data_res = await fetchDataRes(1, period); // Utiliser la valeur sélectionnée
+    const moy = data_res[0].moyenne;
+    const minimum = data_res[0].min;
+    const maximum = data_res[0].max;
+    const data_inst = await fetchDataInst(1);
+    const val_inst = data_inst[0]._value;
+
+    displayThermometer(val_inst, moy, minimum, maximum, "thermoChart");
 }
+
 
 // Appel de la fonction displayValues pour démarrer l'affichage des valeurs
 displayValues();

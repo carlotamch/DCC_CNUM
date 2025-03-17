@@ -17,29 +17,27 @@
     <link rel="icon" type="image/png" href="img/econect-favicon.png" />
 </head>
 <body>
-    <table id = "tab1" width = "98%">
-        <tr>
-            <td width="55%">
-                <div id="divGeneral" style="height:100px;border-width:2px;line-height: 0.6; border-style:none;border-color:white; position: relative; top: -10px;"></div> 
-            </td>
-            <td width="38%" style = "vertical-align: middle;" >
-                <img src = "img/logo-feder.png" width=650px style="position: relative; top: -10px; border-style:none;">
-            </td>
-            <td>
-                <img src = "img/logo-econect.png" width=140px style="position: relative; top: -5px; border-style:none;">
-            </td>
-
-        </tr>
-    </table>
     <table width="100%">
         <tr>
-            <td width="3%">
-            </td>
+            <td width="3%"></td>
             <td width="100%">
-                <canvas id="thermoChart" width="500" height="500" style="border-style:solid;border-color:white"></canvas> <!-- Traçage du graphe dans ce canvas -->
-            
+                <!-- Ajout du menu déroulant ici -->
+                <label for="period">Choisir une période :</label>
+                <select id="period">
+                    <option value="0.5">12 heures</option>
+                    <option value="1" selected >1 jour</option>
+                    <option value="3">3 jours</option>
+                    <option value="7">1 semaine</option>
+                    <option value="31">1 mois</option>
+                </select>
+                <button onclick="displayValues()">Mettre à jour</button>
+    
+                <!-- Canvas pour afficher le thermomètre -->
+                <canvas id="thermoChart" width="1000" height="1000" style="border-style:solid;border-color:white"></canvas> 
+            </td>
         </tr>
     </table>
+    
 	<script src="thermometre.js" type="text/javascript" charset="utf-8"></script>
                         
 </body>

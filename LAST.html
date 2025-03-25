@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Econect</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Calibri, sans-serif;
+        }
+        table {
+            width: 100%;
+            table-layout: fixed; /* Permet d'adapter les tailles des cellules */
+        }
+        td {
+            padding: 15px;
+            vertical-align: top;
+            border: solid 1px white;
+        }
+        .data-div {
+            width: 100%;
+            height: 30px;
+            line-height: 0.6;
+            border-width: 2px;
+            font-family: Arial;
+            color: white;
+            border-style: solid;
+            border-color: white;
+        }
+
+        /* Conteneur générique des graphiques avec un ratio 16:9 */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* Rapport d'aspect 16:9 par défaut */
+        }
+
+        /* Graphiques spécifiques avec des rapports d'aspect différents */
+        .chart-container-thermo, .chart-container-humidity {
+            width: 20vw;
+            height: 20vw; /* Rapport d'aspect 4:3 pour thermoChart et humidityMeter */
+        }
+
+        /* Conteneur pour le graphique de Beaufort avec un rapport height = 0.25 * width */
+        .chart-container-beaufort {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 35%; /* Rapport d'aspect height = 0.25 * width */
+        margin: 0; /* Supprimer les marges */
+        }
+
+        /* Conteneur pour les autres graphiques avec un rapport 50/50 */
+        .chart-container-50-50 {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 100%; /* Rapport d'aspect 1:1 */
+        }
+
+        .chart-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-style: solid;
+            border-color: white;
+        }
+
+        /* Pour les titres des graphiques */
+        h3 {
+            color: black;
+            font-family: Calibri, sans-serif;
+            font-size: 1.5vw; /* Ajuste la taille du texte en fonction de la largeur de la fenêtre */
+        }
+    </style>
+    <link rel="icon" type="image/png" href="img/econect-favicon.png" />
+</head>
+<body>
+    <table id="tab1" width="98%">
+        <tr>
+            <td width="55%">
+                <div id="divGeneral" style="height:100px;border-width:2px;line-height: 0.6; border-style:none;border-color:white; position: relative; top: -10px;"></div>
+                <h1 style="margin-bottom: 5px; color: black; font-family: Calibri, sans-serif;font-size: 3vw;">Relevés météorologiques</h1>
+                <h2 style="margin-bottom: 10px; color: black; font-family: Calibri, sans-serif;font-size: 2vw;">Station La Barthe Francon</h2>
+                <p id="lastDate" style="margin-bottom: 5px; color: black; font-family: Calibri, sans-serif; font-size: 1vw;"></p>
+                <p id="lastUpdate" style="margin-bottom: 15px; color: black; font-family: Calibri, sans-serif; font-size: 1.5vw;"></p>
+                <label for="periodSelect" style="font-size: 1vw;">Période :</label>
+                <select id="periodSelect" style="font-size: 1vw;">
+                    <option value="0.25" selected >6 heures</option>
+                    <option value="0.5">12 heures</option>
+                    <option value="1" >1 jour</option>
+                    <option value="3">3 jours</option>
+                    <option value="7">7 jours</option>
+                    <option value="31">1 mois</option>
+                </select>
+            </td>
+            <td width="38%" style="vertical-align: middle;">
+                <img src="img/logo-feder.png" width="100%" style="border-style:none;" alt="Feder Logo">
+            </td>
+            <td>
+                <img src="img/logo-econect.png" width="50%" style="border-style:none;" alt="Econect Logo">
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <td width="33%">
+                <h3>Température de l'air</h3>
+                <div class="chart-container chart-container-thermo">
+                    <canvas id="thermoChart" class="chart-canvas"></canvas>
+                </div>
+            </td>
+            <td width="33%">
+                <h3>Humidité de l'air</h3>
+                <div class="chart-container chart-container-humidity">
+                    <canvas id="humidityMeter" class="chart-canvas"></canvas>
+                </div>
+            </td>
+            <td width="33%">
+                <h3>Pression atmosphérique</h3>
+                <div class="chart-container chart-container-50-50">
+                    <canvas id="pressuremeter" class="chart-canvas"></canvas>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="26%">
+                <h3>Rayonnement solaire</h3>
+                <div class="chart-container chart-container-50-50">
+                    <canvas id="fluxsolaire" class="chart-canvas"></canvas>
+                </div>
+            </td>
+            <td width="37%">
+                <h3>Précipitations</h3>
+                <div class="chart-container chart-container-50-50">
+                    <canvas id="histogramP" class="chart-canvas"></canvas>
+                </div>
+            </td>
+            <td width="37%">
+                <h3>Evapotranspiration</h3>
+                <div class="chart-container chart-container-50-50">
+                    <canvas id="histogramETP" class="chart-canvas"></canvas>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="70%" colspan="2">
+                <h3>Vitesse du vent</h3>
+                <div class="chart-container chart-container-beaufort">
+                    <canvas id="beaufort" class="chart-canvas"></canvas>
+                </div>
+            </td>
+            <td width="30%">
+                <h3>Direction du vent</h3>
+                <div class="chart-container chart-container-50-50">
+                    <canvas id="rose" class="chart-canvas"></canvas>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Charger Chart.js -->
+    <script src="LAST.js" type="text/javascript" charset="utf-8" defer></script>
+</body>
+</html>
